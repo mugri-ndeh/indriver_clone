@@ -1,4 +1,4 @@
-package com.example.indriver_clone
+package com.motor.safedrive
 
 import io.flutter.embedding.android.FlutterActivity
 
