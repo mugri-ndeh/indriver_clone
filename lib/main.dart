@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indriver_clone/screens/account_details.dart';
 import 'package:indriver_clone/screens/homepage.dart';
+import 'package:indriver_clone/screens/otp_verification.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const Login(),
+      home: HomePage(),
     );
   }
 }
@@ -45,8 +47,10 @@ class _LoginState extends State<Login> {
 
   String initialCountry = 'NG';
 
-  PhoneNumber number = PhoneNumber(isoCode: 'NG');
+  PhoneNumber _number = PhoneNumber(isoCode: 'NG');
   String? locale;
+
+  final _formKey = GlobalKey<FormState>();
 
   Future<void> initPlatformState() async {
     String? platformVersion;
@@ -68,18 +72,18 @@ class _LoginState extends State<Login> {
     });
   }
 
-  void getPhoneNumber() async {
-    // PhoneNumber number =
-    //     await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber, 'US');
-    //locale = await Devicelocale.currentLocale;
-    Locale myLocale = Localizations.localeOf(context);
-    print(myLocale);
-    //print(locale);
+  // void getPhoneNumber() async {
+  //   // PhoneNumber number =
+  //   //     await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber, 'US');
+  //   //locale = await Devicelocale.currentLocale;
+  //   Locale myLocale = Localizations.localeOf(context);
+  //   print(myLocale);
+  //   //print(locale);
 
-    setState(() {
-      this.number = number;
-    });
-  }
+  //   setState(() {
+  //     this.number = number;
+  //   });
+  // }
 
   @override
   void dispose() {
@@ -99,49 +103,71 @@ class _LoginState extends State<Login> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: SingleChildScrollView(
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.9,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Enter your phone number to sign in',
-                  style: TextStyle(fontSize: 22),
-                ),
-                InternationalPhoneNumberInput(
-                  onInputChanged: (PhoneNumber number) {
-                    // ignore: avoid_print
-                    print(number.phoneNumber);
-                  },
-                  onInputValidated: (bool value) {
-                    // ignore: avoid_print
-                    print(value);
-                  },
-                  selectorConfig: const SelectorConfig(
-                      selectorType: PhoneInputSelectorType.DIALOG),
-                  ignoreBlank: false,
-                  autoValidateMode: AutovalidateMode.disabled,
-                  selectorTextStyle: const TextStyle(color: Colors.black),
-                  initialValue: number,
-                  textFieldController: controller1,
-                  formatInput: false,
-                  keyboardType: const TextInputType.numberWithOptions(
-                      signed: true, decimal: true),
-                  onSaved: (PhoneNumber number) {
-                    // ignore: avoid_print
-                    print('On Saved: $number');
-                  },
-                ),
-                Container(
-                  child: Column(
+          child: Form(
+            key: _formKey,
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.9,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Enter your phone number to sign in',
+                    style: TextStyle(fontSize: 22),
+                  ),
+                  InternationalPhoneNumberInput(
+                    validator: (val) {
+                      //print(val);
+                      if (val!.isEmpty) {
+                        return 'Field cannot be empty';
+                      }
+                    },
+                    onInputChanged: (PhoneNumber number) {
+                      // ignore: avoid_print
+                      //print(number.phoneNumber);
+                      setState(() {
+                        _number = number;
+                      });
+                    },
+                    onInputValidated: (bool value) {
+                      // ignore: avoid_print
+                      //print(value);
+                    },
+                    selectorConfig: const SelectorConfig(
+                        selectorType: PhoneInputSelectorType.DIALOG),
+                    ignoreBlank: false,
+                    autoValidateMode: AutovalidateMode.disabled,
+                    selectorTextStyle: const TextStyle(color: Colors.black),
+                    initialValue: _number,
+                    textFieldController: controller1,
+                    formatInput: false,
+                    maxLength: 12,
+                    keyboardType: const TextInputType.numberWithOptions(
+                        signed: true, decimal: true),
+                    onSaved: (PhoneNumber number) {
+                      // ignore: avoid_print
+                      //print('On Saved: $number');
+                    },
+                  ),
+                  Column(
                     children: [
                       ElevatedButton(
                           onPressed: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => HomePage()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Verification(
+                                  phoneNum: _number.phoneNumber!,
+                                ),
+                              ),
+                            );
+                            if (_formKey.currentState!.validate()) {
+                              if (_number != null) {
+                                print(_number.phoneNumber);
+                              } else {
+                                print('Enter a phone number');
+                              }
+                            }
                           },
                           child: const Text('Next')),
                       const Text(
@@ -149,9 +175,9 @@ class _LoginState extends State<Login> {
                         style: TextStyle(fontSize: 12),
                       )
                     ],
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ),
         ),
