@@ -27,20 +27,22 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  cloud_firestore: ^2.4.0
   cupertino_icons: ^1.0.2
   devicelocale: ^0.5.0
-  flutter:
-    sdk: flutter
-  geolocator: ^7.7.1
-  google_maps_flutter: ^2.1.0
-  google_maps_flutter_web: ^0.3.2
-  flutter_sim_country_code: ^0.1.1
   firebase_auth: ^3.0.1
   firebase_core: ^1.4.0
   firebase_storage: ^10.0.1
-  cloud_firestore: ^2.4.0
+  flutter:
+    sdk: flutter
+  flutter_sim_country_code: ^0.1.1
+  geolocator: ^7.7.1
+  google_maps_flutter: ^2.1.0
+  google_maps_flutter_web: ^0.3.2
+  pinput: ^1.2.2
 
 dev_dependencies:
+  change_app_package_name: ^1.0.0
   date_field: ^2.1.2
 
   # The "flutter_lints" package below contains a set of recommended lints to
