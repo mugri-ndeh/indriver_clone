@@ -67,34 +67,36 @@ class _HomePageState extends State<HomePage> {
               child: Form(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
-                    children: const [
-                      ListTile(
-                          leading: Icon(Icons.circle_outlined),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: const [
+                        ListTile(
+                            leading: Icon(Icons.circle_outlined),
+                            title: TextField(
+                              decoration:
+                                  InputDecoration(hintText: 'Pickup location'),
+                            )),
+                        ListTile(
+                            leading: Icon(Icons.circle_outlined),
+                            title: TextField(
+                              decoration:
+                                  InputDecoration(hintText: 'Destination'),
+                            )),
+                        ListTile(
+                          leading: Icon(Icons.money_sharp),
                           title: TextField(
                             decoration:
-                                InputDecoration(hintText: 'Pickup location'),
-                          )),
-                      ListTile(
-                          leading: Icon(Icons.circle_outlined),
-                          title: TextField(
-                            decoration:
-                                InputDecoration(hintText: 'Destination'),
-                          )),
-                      ListTile(
-                        leading: Icon(Icons.money_sharp),
-                        title: TextField(
-                          decoration:
-                              InputDecoration(hintText: 'Offer your fare'),
+                                InputDecoration(hintText: 'Offer your fare'),
+                          ),
                         ),
-                      ),
-                      ListTile(
-                          leading: Icon(Icons.message),
-                          title: TextField(
-                            decoration:
-                                InputDecoration(hintText: 'Comment and wishes'),
-                          )),
-                    ],
+                        ListTile(
+                            leading: Icon(Icons.message),
+                            title: TextField(
+                              decoration: InputDecoration(
+                                  hintText: 'Comment and wishes'),
+                            )),
+                      ],
+                    ),
                   ),
                 ),
               ),
