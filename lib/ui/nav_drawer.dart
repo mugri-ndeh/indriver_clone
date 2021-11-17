@@ -6,6 +6,7 @@ import 'package:indriver_clone/screens/profile_settings.dart';
 import 'package:indriver_clone/screens/request_history.dart';
 import 'package:indriver_clone/screens/settings.dart';
 import 'package:indriver_clone/screens/support.dart';
+import 'package:indriver_clone/ui/button.dart';
 
 class NavDrawer extends StatefulWidget {
   const NavDrawer({Key? key}) : super(key: key);
@@ -122,14 +123,26 @@ class _NavDrawerState extends State<NavDrawer> {
                 ],
               ),
             ),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => MainDriverPage()),
-                      (route) => false);
-                },
-                child: const Text('Switch to Driver'))
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Navigator.pushAndRemoveUntil(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => MainDriverPage()),
+            //         (route) => false);
+            //   },
+            //   child: const Text('Switch to Driver'),
+            // )
+            BotButton(
+              onTap: () {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MainDriverPage(),
+                    ),
+                    (route) => false);
+              },
+              title: 'Switch to driver',
+            )
           ],
         ),
       ),
