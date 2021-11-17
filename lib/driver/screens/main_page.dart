@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:indriver_clone/driver/screens/earnings.dart';
 import 'package:indriver_clone/driver/screens/rating.dart';
 import 'package:indriver_clone/driver/screens/ride_requests.dart';
+import 'package:indriver_clone/ui/constants.dart';
 import 'package:indriver_clone/ui/nav_drawer.dart';
 
 class MainDriverPage extends StatefulWidget {
@@ -14,8 +15,8 @@ class MainDriverPage extends StatefulWidget {
 class _MainDriverPageState extends State<MainDriverPage> {
   PageController? pageController;
   int _selectedIndex = 0;
-  List<Widget> _screens = [
-    RideRequests(),
+  final List<Widget> _screens = [
+    const RideRequests(),
     Earnings(),
     Ratings(),
   ];
@@ -49,22 +50,25 @@ class _MainDriverPageState extends State<MainDriverPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: NavDrawer(),
+      drawer: const NavDrawer(),
       appBar: AppBar(
         title: ElevatedButton(
           onPressed: () {},
-          child: Text('Offline'),
+          child: const Text('Offline'),
         ),
         leading: Builder(builder: (context) {
           return IconButton(
-            icon: Icon(Icons.menu),
+            icon: const Icon(Icons.menu),
             onPressed: () {
               Scaffold.of(context).openDrawer();
             },
           );
         }),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.settings_outlined))
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.settings_outlined),
+          )
         ],
       ),
       body: PageView(
@@ -75,7 +79,7 @@ class _MainDriverPageState extends State<MainDriverPage> {
       bottomNavigationBar: BottomNavigationBar(
         onTap: _onTapped,
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.green,
+        selectedItemColor: primaryColor,
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.menu), label: 'Ride Requests'),
