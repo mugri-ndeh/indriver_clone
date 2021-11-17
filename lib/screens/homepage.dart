@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:indriver_clone/providers/handle.dart';
+import 'package:indriver_clone/screens/search_screen.dart';
 import 'package:indriver_clone/ui/app_bar.dart';
 import 'package:indriver_clone/ui/nav_drawer.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
+import 'package:indriver_clone/util/assistant_methods.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -13,53 +17,45 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late GoogleMapController mapController;
-
   final LatLng _center = const LatLng(45.521563, -122.677433);
 
   void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-    locatePosition();
-  }
-
-  Position? liveLocation;
-  var geolocator = Geolocator();
-
-  void locatePosition() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    liveLocation = position;
-
-    LatLng liveposition = LatLng(position.latitude, position.longitude);
-
-    CameraPosition cameraPosition =
-        CameraPosition(target: liveposition, zoom: 14);
-    mapController.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    var provider = Provider.of<AppHandler>(context, listen: false);
+    provider.mapController = controller;
+    provider.locatePosition(context);
   }
 
   GoogleMapController? newController;
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
-      drawer: NavDrawer(),
+      drawer: const NavDrawer(),
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       appBar: const HomeAppBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.6,
-              child: GoogleMap(
-                onMapCreated: _onMapCreated,
-                initialCameraPosition: CameraPosition(
-                  target: _center,
-                  zoom: 14.0,
+            Consumer<AppHandler>(
+              builder: (_, location, __) => SizedBox(
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: GoogleMap(
+                  mapType: MapType.normal,
+                  myLocationEnabled: true,
+                  markers: location.markersSet,
+                  circles: location.circlesSet,
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: _center,
+                    zoom: 14.0,
+                  ),
+                  myLocationButtonEnabled: true,
+                  //zoomControlsEnabled: true,
+                  zoomGesturesEnabled: true,
+                  polylines: location.polylineSet,
                 ),
-                myLocationButtonEnabled: true,
-                zoomControlsEnabled: true,
-                zoomGesturesEnabled: true,
               ),
             ),
             SizedBox(
@@ -68,34 +64,71 @@ class _HomePageState extends State<HomePage> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: SingleChildScrollView(
-                    child: Column(
-                      children: const [
-                        ListTile(
-                            leading: Icon(Icons.circle_outlined),
-                            title: TextField(
-                              decoration:
-                                  InputDecoration(hintText: 'Pickup location'),
-                            )),
-                        ListTile(
-                            leading: Icon(Icons.circle_outlined),
-                            title: TextField(
-                              decoration:
-                                  InputDecoration(hintText: 'Destination'),
-                            )),
-                        ListTile(
-                          leading: Icon(Icons.money_sharp),
-                          title: TextField(
-                            decoration:
-                                InputDecoration(hintText: 'Offer your fare'),
+                    child: Consumer<AppHandler>(
+                      builder: (_, location, __) => Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              showBottom(context, size, true);
+                            },
+                            child: ListTile(
+                              leading: const Icon(
+                                Icons.circle_outlined,
+                              ),
+                              // title: TextFormField(
+                              //   enabled: false,
+                              //   focusNode: FocusNode(canRequestFocus: true),
+                              //   initialValue: 'wow',
+                              //   decoration: const InputDecoration(
+                              //       hintText: 'Pickup location'),
+                              // ),
+                              title: Text(location.startpoint),
+                            ),
                           ),
-                        ),
-                        ListTile(
-                            leading: Icon(Icons.message),
-                            title: TextField(
-                              decoration: InputDecoration(
-                                  hintText: 'Comment and wishes'),
-                            )),
-                      ],
+                          GestureDetector(
+                            onTap: () {
+                              //location.findPlace('');
+                              showBottom(context, size, false);
+                            },
+                            child: ListTile(
+                              leading: const Icon(Icons.circle_outlined),
+                              // title: TextFormField(
+                              //   focusNode: FocusNode(canRequestFocus: true),
+                              //   //enabled: false,
+                              //   // initialValue: location.destinationLocation ==
+                              //   //         null
+                              //   //     ? ''
+                              //   //     : location.destinationLocation!.placeName,
+                              //   initialValue: location.dummy,
+                              //   decoration: const InputDecoration(
+                              //       hintText: 'Destination'),
+                              // ),
+                              title: Stack(children: [
+                                Text(location.endpoint),
+                                Positioned(
+                                  child: Divider(
+                                    thickness: 5,
+                                  ),
+                                  top: 10,
+                                )
+                              ]),
+                            ),
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.money_sharp),
+                            title: TextFormField(
+                              decoration: const InputDecoration(
+                                  hintText: 'Offer your fare'),
+                            ),
+                          ),
+                          ListTile(
+                              leading: const Icon(Icons.message),
+                              title: TextFormField(
+                                decoration: const InputDecoration(
+                                    hintText: 'Comment and wishes'),
+                              )),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -106,6 +139,14 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+    );
+  }
+
+  showBottom(BuildContext context, Size size, bool pickup) {
+    showModalBottomSheet(
+      elevation: 1,
+      context: context,
+      builder: (context) => SearchScreen(pickup: pickup),
     );
   }
 }
