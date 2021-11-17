@@ -1,11 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indriver_clone/providers/handle.dart';
 import 'package:indriver_clone/screens/account_details.dart';
 import 'package:indriver_clone/screens/homepage.dart';
 import 'package:indriver_clone/screens/otp_verification.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,13 +21,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ChangeNotifierProvider(
+      create: (context) => AppHandler(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: HomePage(),
       ),
-      home: HomePage(),
     );
   }
 }
@@ -71,19 +76,6 @@ class _LoginState extends State<Login> {
       _platformVersion = platformVersion;
     });
   }
-
-  // void getPhoneNumber() async {
-  //   // PhoneNumber number =
-  //   //     await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber, 'US');
-  //   //locale = await Devicelocale.currentLocale;
-  //   Locale myLocale = Localizations.localeOf(context);
-  //   print(myLocale);
-  //   //print(locale);
-
-  //   setState(() {
-  //     this.number = number;
-  //   });
-  // }
 
   @override
   void dispose() {
