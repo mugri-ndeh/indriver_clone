@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "778294940441",
-    "project_id": "indriverclone-331620",
-    "storage_bucket": "indriverclone-331620.appspot.com"
+    "project_number": "849008910110",
+    "project_id": "safedrive-20b99",
+    "storage_bucket": "safedrive-20b99.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:778294940441:android:aa6330269616989e276b88",
+        "mobilesdk_app_id": "1:849008910110:android:919c47e7fd7856ed14730f",
         "android_client_info": {
-          "package_name": "com.example.indriver_clone"
+          "package_name": "com.motor.safedrive"
         }
       },
       "oauth_client": [
         {
-          "client_id": "778294940441-rlhthn2g4v7u0tq3sd0nifbc9rgfvml1.apps.googleusercontent.com",
+          "client_id": "849008910110-uqjj4h0qolpslfqs9brppk8jcpm17p5t.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDcxvXlyVaedFB9kEEb1P1ZpNIH7YTC9MM"
+          "current_key": "AIzaSyAFP6cFSfCgBF4Q8sQfNJlRY5z8W54_e-k"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "778294940441-rlhthn2g4v7u0tq3sd0nifbc9rgfvml1.apps.googleusercontent.com",
+              "client_id": "849008910110-uqjj4h0qolpslfqs9brppk8jcpm17p5t.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
