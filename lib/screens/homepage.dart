@@ -4,6 +4,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:indriver_clone/providers/handle.dart';
 import 'package:indriver_clone/screens/search_screen.dart';
 import 'package:indriver_clone/ui/app_bar.dart';
+import 'package:indriver_clone/ui/button.dart';
+import 'package:indriver_clone/ui/constants.dart';
 import 'package:indriver_clone/ui/nav_drawer.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:indriver_clone/util/assistant_methods.dart';
@@ -72,8 +74,11 @@ class _HomePageState extends State<HomePage> {
                               showBottom(context, size, true);
                             },
                             child: ListTile(
-                              leading: const Icon(
+                              leading: Icon(
                                 Icons.circle_outlined,
+                                color: location.startSelected
+                                    ? startMarker
+                                    : notSelected,
                               ),
                               // title: TextFormField(
                               //   enabled: false,
@@ -91,7 +96,12 @@ class _HomePageState extends State<HomePage> {
                               showBottom(context, size, false);
                             },
                             child: ListTile(
-                              leading: const Icon(Icons.circle_outlined),
+                              leading: Icon(
+                                Icons.circle_outlined,
+                                color: location.endSelected
+                                    ? endMarker
+                                    : notSelected,
+                              ),
                               // title: TextFormField(
                               //   focusNode: FocusNode(canRequestFocus: true),
                               //   //enabled: false,
@@ -105,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                               // ),
                               title: Stack(children: [
                                 Text(location.endpoint),
-                                Positioned(
+                                const Positioned(
                                   child: Divider(
                                     thickness: 5,
                                   ),
@@ -134,8 +144,11 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            ElevatedButton(
-                onPressed: () {}, child: const Text('Request a vehicle'))
+            BotButton(
+                onTap: () {
+                  makeRequest();
+                },
+                title: 'Request a vehicle')
           ],
         ),
       ),
@@ -149,4 +162,6 @@ class _HomePageState extends State<HomePage> {
       builder: (context) => SearchScreen(pickup: pickup),
     );
   }
+
+  void makeRequest() {}
 }
