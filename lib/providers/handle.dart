@@ -19,6 +19,9 @@ class AppHandler with ChangeNotifier {
   var predictionList = [];
   var dummy;
 
+  bool startSelected = false;
+  bool endSelected = false;
+
   var startpoint = 'Start point';
   var endpoint = 'End point';
 
@@ -62,6 +65,7 @@ class AppHandler with ChangeNotifier {
   void updatePickupLocationAdress(Address pickupAddress) {
     pickupLocation = pickupAddress;
     startpoint = pickupLocation!.placeName!;
+    startSelected = true;
     notifyListeners();
   }
 
@@ -69,6 +73,7 @@ class AppHandler with ChangeNotifier {
   void updateDestinationLocationAdress(Address destinationAddress) {
     destinationLocation = destinationAddress;
     endpoint = destinationLocation!.placeName!;
+    endSelected = true;
     notifyListeners();
   }
 
