@@ -12,6 +12,18 @@ class _RatingsState extends State<Ratings> with AutomaticKeepAliveClientMixin {
   bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(),
+            const Padding(
+              padding: EdgeInsets.all(5),
+            ),
+            Container(),
+          ],
+        ),
+      ),
+    );
   }
 }
