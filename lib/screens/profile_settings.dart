@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:date_field/date_field.dart';
+import 'package:indriver_clone/ui/button.dart';
+import 'package:indriver_clone/ui/constants.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -25,7 +27,7 @@ class _ProfileState extends State<Profile> {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.green,
+            color: primaryColor,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -43,6 +45,7 @@ class _ProfileState extends State<Profile> {
                     children: [
                       const Center(
                         child: CircleAvatar(
+                          backgroundColor: primaryColor,
                           child: Icon(
                             Icons.person,
                             size: 80,
@@ -88,7 +91,7 @@ class _ProfileState extends State<Profile> {
                     ],
                   ),
                 ),
-                ElevatedButton(onPressed: () {}, child: const Text('Save'))
+                BotButton(onTap: () {}, title: 'Save')
               ],
             ),
           ),
