@@ -29,6 +29,13 @@ class _HomePageState extends State<HomePage> {
 
   GoogleMapController? newController;
 
+  _mapTapped(LatLng location) {
+    print(location);
+// The result will be the location you've been selected
+// something like this LatLng(12.12323,34.12312)
+// you can do whatever you do with it
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -44,6 +51,7 @@ class _HomePageState extends State<HomePage> {
               builder: (_, location, __) => SizedBox(
                 height: MediaQuery.of(context).size.height * 0.6,
                 child: GoogleMap(
+                  onTap: _mapTapped,
                   mapType: MapType.normal,
                   myLocationEnabled: true,
                   markers: location.markersSet,
