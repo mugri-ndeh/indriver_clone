@@ -79,7 +79,9 @@ class AssistantMethods {
       return directionDetails;
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
           content: Text('Could not get directions'),
         ),
       );
