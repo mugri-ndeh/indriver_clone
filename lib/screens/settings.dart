@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indriver_clone/ui/app_bar.dart';
+import 'package:indriver_clone/ui/nav_drawer.dart';
 
 class Settings extends StatelessWidget {
   const Settings({Key? key}) : super(key: key);
@@ -7,6 +8,7 @@ class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const NavDrawer(),
       appBar: const NavAppbar(title: 'Settings'),
       body: SingleChildScrollView(
         child: Column(

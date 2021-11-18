@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indriver_clone/ui/app_bar.dart';
+import 'package:indriver_clone/ui/nav_drawer.dart';
 
 class Help extends StatelessWidget {
   const Help({Key? key}) : super(key: key);
@@ -8,6 +9,7 @@ class Help extends StatelessWidget {
   Widget build(BuildContext context) {
     // ignore: prefer_const_constructors
     return Scaffold(
+      drawer: const NavDrawer(),
       appBar: const NavAppbar(title: 'Help'),
     );
   }
