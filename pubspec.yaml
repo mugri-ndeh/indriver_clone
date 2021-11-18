@@ -41,7 +41,7 @@ dependencies:
   google_maps_flutter: ^2.1.0
   google_maps_flutter_web: ^0.3.2
   http: ^0.13.4
-  passbase_flutter: ^2.9.2
+  # passbase_flutter: ^2.9.2
   pinput: ^1.2.2
   provider: ^6.0.1
 
