@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:indriver_clone/ui/constants.dart';
 
@@ -20,11 +18,20 @@ class _BotButtonState extends State<BotButton> {
     Size size = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: widget.onTap,
-      child: Container(
-        width: size.width * 0.9,
-        child: Text(widget.title, style: const TextStyle(color: Colors.white)),
-        decoration: BoxDecoration(
-            color: buttonColor, borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          height: 50,
+          width: size.width * 0.9,
+          child: Center(
+            child: Text(
+              widget.title,
+              style: const TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          ),
+          decoration: BoxDecoration(
+              color: buttonColor, borderRadius: BorderRadius.circular(24)),
+        ),
       ),
     );
   }
