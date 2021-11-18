@@ -52,13 +52,19 @@ class _MainDriverPageState extends State<MainDriverPage> {
     return Scaffold(
       drawer: const NavDrawer(),
       appBar: AppBar(
-        title: ElevatedButton(
-          onPressed: () {},
-          child: const Text('Offline'),
+        backgroundColor: Colors.white,
+        title: Center(
+          child: ElevatedButton(
+            onPressed: () {},
+            child: const Text('Offline'),
+          ),
         ),
         leading: Builder(builder: (context) {
           return IconButton(
-            icon: const Icon(Icons.menu),
+            icon: const Icon(
+              Icons.menu,
+              color: primaryColor,
+            ),
             onPressed: () {
               Scaffold.of(context).openDrawer();
             },
