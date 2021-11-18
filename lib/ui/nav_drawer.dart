@@ -7,6 +7,7 @@ import 'package:indriver_clone/screens/request_history.dart';
 import 'package:indriver_clone/screens/settings.dart';
 import 'package:indriver_clone/screens/support.dart';
 import 'package:indriver_clone/ui/button.dart';
+import 'package:indriver_clone/ui/constants.dart';
 
 class NavDrawer extends StatefulWidget {
   const NavDrawer({Key? key}) : super(key: key);
@@ -36,6 +37,7 @@ class _NavDrawerState extends State<NavDrawer> {
                       ),
                     ),
                     child: DrawerHeader(
+                      curve: Curves.easeIn,
                       padding: const EdgeInsets.all(4),
                       margin: EdgeInsets.zero,
                       child: Row(
@@ -43,6 +45,7 @@ class _NavDrawerState extends State<NavDrawer> {
                         children: const [
                           Expanded(
                             child: CircleAvatar(
+                              backgroundColor: primaryColor,
                               radius: 50,
                               child: Icon(Icons.person),
                             ),
@@ -58,9 +61,6 @@ class _NavDrawerState extends State<NavDrawer> {
                         ],
                       ),
                     ),
-                  ),
-                  const Divider(
-                    thickness: 3,
                   ),
                   GestureDetector(
                     onTap: () {

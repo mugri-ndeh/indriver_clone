@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:indriver_clone/ui/constants.dart';
 
 class HomeAppBar extends StatelessWidget with PreferredSizeWidget {
   const HomeAppBar({Key? key}) : super(key: key);
@@ -17,7 +18,7 @@ class HomeAppBar extends StatelessWidget with PreferredSizeWidget {
             },
             icon: const Icon(
               Icons.menu,
-              color: Colors.green,
+              color: primaryColor,
             ),
           ),
         );
@@ -29,7 +30,7 @@ class HomeAppBar extends StatelessWidget with PreferredSizeWidget {
             onPressed: () {},
             icon: const Icon(
               Icons.share,
-              color: Colors.green,
+              color: primaryColor,
             ),
           ),
         )
@@ -55,11 +56,16 @@ class NavAppbar extends StatelessWidget with PreferredSizeWidget {
       leading: Builder(builder: (context) {
         return IconButton(
           onPressed: () {
-            Scaffold.of(context).openDrawer();
+            try {
+              Scaffold.of(context).openDrawer();
+            } catch (e) {
+              print(e);
+            }
+            print('pressed');
           },
           icon: const Icon(
             Icons.menu,
-            color: Colors.green,
+            color: primaryColor,
           ),
         );
       }),
