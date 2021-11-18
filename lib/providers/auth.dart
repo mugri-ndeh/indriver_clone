@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:indriver_clone/models/user.dart';
+import 'package:indriver_clone/screens/account_details.dart';
 
 enum AuthState { loggedIn, loggedOut }
 
@@ -11,6 +13,7 @@ class Authentication with ChangeNotifier {
   UserModel loggedUser = UserModel();
   final _firestore = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
+  String? verificationCode;
 
   Authentication() {
     init();
@@ -48,7 +51,84 @@ class Authentication with ChangeNotifier {
   }
 
   logout() {}
-  register() {}
+  Future<void> signin(String phoneNum, BuildContext context) async {
+    try {
+      await auth.verifyPhoneNumber(
+        phoneNumber: phoneNum,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await FirebaseAuth.instance
+              .signInWithCredential(credential)
+              .then((value) {
+            if (value.user != null) {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (c) => const CompleteSignUp(),
+                  ),
+                  (route) => false);
+            }
+          });
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.message.toString()),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        },
+        codeSent: (String vID, int? resendToken) {
+          verificationCode = vID;
+        },
+        codeAutoRetrievalTimeout: (String vID) {
+          verificationCode = vID;
+        },
+        timeout: const Duration(seconds: 60),
+      );
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+    }
+  }
+
+  Future<void> register(String phoneNumber, BuildContext context) async {
+    try {
+      await auth.verifyPhoneNumber(
+        phoneNumber: phoneNumber!,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await FirebaseAuth.instance
+              .signInWithCredential(credential)
+              .then((value) {
+            if (value.user != null) {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (c) => const CompleteSignUp(),
+                  ),
+                  (route) => false);
+            }
+          });
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.message.toString()),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        },
+        codeSent: (String vID, int? resendToken) {
+          verificationCode = vID;
+        },
+        codeAutoRetrievalTimeout: (String vID) {
+          verificationCode = vID;
+        },
+        timeout: const Duration(seconds: 60),
+      );
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+    }
+  }
+
   completeprofile() {}
   Future<UserModel> returnUser() async {
     User? currentUser = auth.currentUser;
