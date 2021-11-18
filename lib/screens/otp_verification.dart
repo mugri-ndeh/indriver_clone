@@ -42,7 +42,7 @@ class _VerificationState extends State<Verification> {
               .then((value) {
             if (value.user != null) {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (c) => CompleteSignUp()),
+                MaterialPageRoute(builder: (c) => const CompleteSignUp()),
               );
             }
           });
