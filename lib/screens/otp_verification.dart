@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:indriver_clone/providers/auth.dart';
 import 'package:indriver_clone/screens/account_details.dart';
 import 'package:indriver_clone/screens/homepage.dart';
 import 'package:pinput/pin_put/pin_put.dart';
+import 'package:provider/provider.dart';
 
 class Verification extends StatefulWidget {
   const Verification({Key? key, required this.phoneNum}) : super(key: key);
@@ -34,38 +37,8 @@ class _VerificationState extends State<Verification> {
   }
 
   void verifyPhoneNumber() async {
-    await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: widget.phoneNum,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await FirebaseAuth.instance
-              .signInWithCredential(credential)
-              .then((value) {
-            if (value.user != null) {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (c) => const CompleteSignUp()),
-              );
-            }
-          });
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.message.toString()),
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        },
-        codeSent: (String vID, int? resendToken) {
-          setState(() {
-            verificationCode = vID;
-          });
-        },
-        codeAutoRetrievalTimeout: (String vID) {
-          setState(() {
-            verificationCode = vID;
-          });
-        },
-        timeout: const Duration(seconds: 60));
+    var provider = Provider.of<Authentication>(context, listen: false);
+    provider.signin(widget.phoneNum, context);
   }
 
   @override
