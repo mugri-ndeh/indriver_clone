@@ -12,7 +12,7 @@ class Root extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Provider.of<Authentication>(context, listen: false);
 
-    return StreamBuilder<UserModel>(
+    return StreamBuilder<UserModel?>(
       stream: auth.onAuthStateChanged(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
