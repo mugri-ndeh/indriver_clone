@@ -1,10 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:indriver_clone/providers/auth.dart';
 import 'package:indriver_clone/providers/handle.dart';
-import 'package:indriver_clone/screens/account_details.dart';
-import 'package:indriver_clone/screens/homepage.dart';
 import 'package:indriver_clone/screens/otp_verification.dart';
+import 'package:indriver_clone/screens/root.dart';
+import 'package:indriver_clone/ui/button.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:provider/provider.dart';
@@ -21,15 +22,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AppHandler(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AppHandler()),
+        ChangeNotifierProvider(create: (context) => Authentication())
+      ],
       child: MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: HomePage(),
+        home: const Root(),
       ),
     );
   }
@@ -143,8 +147,8 @@ class _LoginState extends State<Login> {
                   ),
                   Column(
                     children: [
-                      ElevatedButton(
-                          onPressed: () {
+                      BotButton(
+                          onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -161,7 +165,7 @@ class _LoginState extends State<Login> {
                               }
                             }
                           },
-                          child: const Text('Next')),
+                          title: 'Next'),
                       const Text(
                         'By tapping \"Next\" you agree to Terms and Conditions and Privacy Policy',
                         style: TextStyle(fontSize: 12),
