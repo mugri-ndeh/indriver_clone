@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:indriver_clone/models/address.dart';
@@ -87,5 +88,134 @@ class AssistantMethods {
       );
       return null;
     }
+  }
+
+  List<LatLng> pLineCoordinates = [];
+  //geolocaor
+  var geolocator = Geolocator();
+
+  //polylines to draw points
+  Set<Polyline> polylineSet = {};
+  Set<Circle> circlesSet = {};
+  Set<Marker> markersSet = {};
+
+  Future<void> getDirection(
+      BuildContext context,
+      String startLat,
+      String startLong,
+      String endLat,
+      String endLong,
+      GoogleMapController mapController) async {
+    var startLngLat = LatLng(double.parse(startLat), double.parse(startLong));
+    var endLatLng = LatLng(double.parse(endLat), double.parse(endLong));
+
+    showDialog(
+      context: context,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    var details = await AssistantMethods.getDirectiondetials(
+        startLngLat, endLatLng, context);
+    Navigator.pop(context);
+
+    print('This are the encoded points');
+    print(details!.encodedPoints!);
+
+    PolylinePoints polylinePoints = PolylinePoints();
+
+    List<PointLatLng> decodedPoints =
+        polylinePoints.decodePolyline(details.encodedPoints!);
+
+    //clear before drawing new lines
+    pLineCoordinates.clear();
+
+    if (decodedPoints.isNotEmpty) {
+      for (var pointLatLng in decodedPoints) {
+        pLineCoordinates
+            .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
+      }
+    }
+
+    //clear nefore drawing directions
+    polylineSet.clear();
+
+//line to be drawn properties
+    Polyline polyline = Polyline(
+        polylineId: const PolylineId('PolylineID'),
+        color: Colors.red,
+        jointType: JointType.round,
+        points: pLineCoordinates,
+        width: 5,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        geodesic: true);
+
+//draw line
+    polylineSet.add(polyline);
+
+// reanimate when drawing lines, ie zooom out of camera
+    LatLngBounds latLngBounds;
+    if (startLngLat.latitude > endLatLng.latitude &&
+        startLngLat.longitude > endLatLng.longitude) {
+      latLngBounds = LatLngBounds(southwest: endLatLng, northeast: startLngLat);
+    } else if (startLngLat.latitude > endLatLng.latitude) {
+      latLngBounds = LatLngBounds(
+        southwest: LatLng(endLatLng.latitude, startLngLat.longitude),
+        northeast: LatLng(startLngLat.latitude, endLatLng.longitude),
+      );
+    } else if (startLngLat.longitude > endLatLng.longitude) {
+      latLngBounds = LatLngBounds(
+        southwest: LatLng(startLngLat.latitude, endLatLng.longitude),
+        northeast: LatLng(endLatLng.latitude, startLngLat.longitude),
+      );
+    } else {
+      latLngBounds = LatLngBounds(southwest: startLngLat, northeast: endLatLng);
+    }
+
+//update screen with changes
+    mapController.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 70));
+
+//draw markers
+    Marker startMarker = Marker(
+      markerId: MarkerId('StartId'),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      //infoWindow:
+      //  InfoWindow(title: initialPosition.placeName, snippet: 'My location'),
+      position: startLngLat,
+    );
+
+    Marker endMarker = Marker(
+      markerId: MarkerId('EndId'),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      //infoWindow: InfoWindow(title: initialPosition.placeName, snippet: 'Destination'),
+      position: endLatLng,
+    );
+
+    markersSet.add(startMarker);
+
+    markersSet.add(endMarker);
+
+    Circle startCircle = Circle(
+      fillColor: Colors.yellow,
+      center: startLngLat,
+      radius: 12,
+      strokeColor: Colors.yellowAccent,
+      strokeWidth: 4,
+      circleId: const CircleId('StartId'),
+    );
+
+    Circle endCircle = Circle(
+      fillColor: Colors.blue,
+      center: endLatLng,
+      radius: 12,
+      strokeColor: Colors.blueAccent,
+      strokeWidth: 4,
+      circleId: const CircleId('EndId'),
+    );
+    circlesSet.add(startCircle);
+
+    circlesSet.add(endCircle);
   }
 }
