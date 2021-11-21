@@ -32,6 +32,7 @@ dependencies:
   devicelocale: ^0.5.0
   firebase_auth: ^3.0.1
   firebase_core: ^1.4.0
+  firebase_database: ^8.1.0
   firebase_storage: ^10.0.1
   flutter:
     sdk: flutter
@@ -41,9 +42,11 @@ dependencies:
   google_maps_flutter: ^2.1.0
   google_maps_flutter_web: ^0.3.2
   http: ^0.13.4
-  # passbase_flutter: ^2.9.2
+  intl: ^0.17.0
+  flutter_toggle_tab: ^1.1.7
   pinput: ^1.2.2
   provider: ^6.0.1
+  passbase_flutter: ^2.9.2
 
 dev_dependencies:
   change_app_package_name: ^1.0.0
