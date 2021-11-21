@@ -4,6 +4,7 @@ import 'package:indriver_clone/driver/screens/rating.dart';
 import 'package:indriver_clone/driver/screens/ride_requests.dart';
 import 'package:indriver_clone/ui/constants.dart';
 import 'package:indriver_clone/ui/nav_drawer.dart';
+import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
 
 class MainDriverPage extends StatefulWidget {
   MainDriverPage({Key? key}) : super(key: key);
@@ -15,6 +16,7 @@ class MainDriverPage extends StatefulWidget {
 class _MainDriverPageState extends State<MainDriverPage> {
   PageController? pageController;
   int _selectedIndex = 0;
+  int toggleIndex = 0;
   final List<Widget> _screens = [
     const RideRequests(),
     Earnings(),
@@ -54,9 +56,25 @@ class _MainDriverPageState extends State<MainDriverPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Center(
-          child: ElevatedButton(
-            onPressed: () {},
-            child: const Text('Offline'),
+          child: FlutterToggleTab(
+            selectedBackgroundColors: const [primaryColor],
+            width: 40,
+            height: 30,
+            borderRadius: 25,
+            selectedTextStyle: const TextStyle(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+            unSelectedTextStyle: const TextStyle(
+                color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w400),
+            labels: const ["offline", "online"],
+            //icons: const [Icons.person, Icons.pregnant_woman],
+            selectedLabelIndex: (index) {
+              setState(() {
+                toggleIndex = index;
+              });
+
+              print("Selected Index $index");
+            },
+            selectedIndex: toggleIndex,
           ),
         ),
         leading: Builder(builder: (context) {
