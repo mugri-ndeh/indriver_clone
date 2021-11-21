@@ -75,10 +75,6 @@ class _SearchScreenState extends State<SearchScreen> {
                           physics: const ClampingScrollPhysics(),
                         ),
                       ),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: const Text('Set location'),
-                )
               ],
             ),
           ),
