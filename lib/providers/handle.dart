@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -5,15 +8,22 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:indriver_clone/models/address.dart';
 import 'package:indriver_clone/models/place_predications.dart';
+import 'package:indriver_clone/models/requests.dart';
+import 'package:indriver_clone/providers/auth.dart';
 import 'package:indriver_clone/util/assistant_methods.dart';
 import 'package:indriver_clone/util/config.dart';
 import 'package:indriver_clone/util/request_assist.dart';
+import 'package:provider/provider.dart';
 
 class AppHandler with ChangeNotifier {
   void init(context) {
     locatePosition(context);
     notifyListeners();
   }
+
+  var _firestore = FirebaseFirestore.instance;
+  var auth = FirebaseAuth.instance;
+  RideRequest request = RideRequest();
 
   Address? pickupLocation, destinationLocation;
   var predictionList = [];
@@ -196,7 +206,7 @@ class AppHandler with ChangeNotifier {
       markerId: MarkerId('EndId'),
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       infoWindow:
-          InfoWindow(title: initialPosition.placeName, snippet: 'Destination'),
+          InfoWindow(title: finalPosition.placeName, snippet: 'Destination'),
       position: endLatLng,
     );
 
@@ -226,5 +236,104 @@ class AppHandler with ChangeNotifier {
     notifyListeners();
     circlesSet.add(endCircle);
     notifyListeners();
+  }
+
+  bool requesting = false;
+  bool deleted = false;
+
+  void sendRequest(
+    String startLat,
+    String startLong,
+    bool accepted,
+    String username,
+    String timeCreated,
+    String phoneNum,
+    String startAddress,
+    String endAddress,
+    String endLat,
+    String endLong,
+    String price,
+  ) async {
+    requesting = true;
+    deleted = false;
+    Map<String, dynamic> rideinfo = {
+      'id': auth.currentUser!.uid,
+      'startLat': startLat,
+      'startLong': startLong,
+      'endLat': endLat,
+      'endLong': endLong,
+      'startAddress': startAddress,
+      'endAddress': endAddress,
+      'price': price,
+      'accepted': accepted,
+      'username': username,
+      'phoneNum': phoneNum,
+      'timeCreated': timeCreated,
+      'driverId': '',
+      'driverArrived': false,
+    };
+
+    try {
+      await _firestore
+          .collection('request')
+          .doc(auth.currentUser!.uid)
+          .set(rideinfo)
+          .then((value) async {
+        await _firestore
+            .collection('request')
+            .doc(auth.currentUser!.uid)
+            .get()
+            .then((value) {
+          request = RideRequest.fromDocument(value);
+          getRequests();
+          notifyListeners();
+        });
+        requesting = false;
+        print('successs');
+      });
+    } on FirebaseException catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> removeRequest() async {
+    try {
+      await _firestore
+          .collection('request')
+          .doc(auth.currentUser!.uid)
+          .delete()
+          .then((value) {
+        deleted = true;
+      });
+    } on FirebaseException catch (e) {
+      print(e.message);
+    }
+  }
+
+  List<RideRequest> requests = [];
+  void getRequests() async {
+    await FirebaseFirestore.instance
+        .collection('request')
+        .where('accepted', isEqualTo: false)
+        .get()
+        .then((value) {
+      requests = (value.docs).map((e) => RideRequest.fromDocument(e)).toList();
+      notifyListeners();
+      print(requests[0].username);
+    });
+    notifyListeners();
+    //print(requests[0].username);
+  }
+
+  void acceptRequest(index, context) async {
+    var currentUser =
+        Provider.of<Authentication>(context, listen: false).auth.currentUser;
+    await FirebaseFirestore.instance
+        .collection('request')
+        .doc(requests[index].id)
+        .update({'accepted': true, 'driverId': currentUser!.uid}).then((value) {
+      requests = [];
+      notifyListeners();
+    });
   }
 }
