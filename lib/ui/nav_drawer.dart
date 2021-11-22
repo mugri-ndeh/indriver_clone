@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:indriver_clone/driver/screens/main_page.dart';
+import 'package:indriver_clone/providers/auth.dart';
 import 'package:indriver_clone/screens/help.dart';
 import 'package:indriver_clone/screens/homepage.dart';
 import 'package:indriver_clone/screens/profile_settings.dart';
@@ -8,6 +10,7 @@ import 'package:indriver_clone/screens/settings.dart';
 import 'package:indriver_clone/screens/support.dart';
 import 'package:indriver_clone/ui/button.dart';
 import 'package:indriver_clone/ui/constants.dart';
+import 'package:provider/provider.dart';
 
 class NavDrawer extends StatefulWidget {
   const NavDrawer({Key? key}) : super(key: key);
@@ -42,8 +45,8 @@ class _NavDrawerState extends State<NavDrawer> {
                       margin: EdgeInsets.zero,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: const [
-                          Expanded(
+                        children: [
+                          const Expanded(
                             child: CircleAvatar(
                               backgroundColor: primaryColor,
                               radius: 50,
@@ -51,11 +54,13 @@ class _NavDrawerState extends State<NavDrawer> {
                             ),
                             flex: 1,
                           ),
-                          Expanded(
-                            flex: 4,
-                            child: ListTile(
-                              leading: Text('Frunwi'),
-                              trailing: Icon(Icons.arrow_forward_ios),
+                          Consumer<Authentication>(
+                            builder: (_, provider, __) => Expanded(
+                              flex: 4,
+                              child: ListTile(
+                                leading: Text(provider.loggedUser.username!),
+                                trailing: const Icon(Icons.arrow_forward_ios),
+                              ),
                             ),
                           ),
                         ],
@@ -64,12 +69,16 @@ class _NavDrawerState extends State<NavDrawer> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => HomePage()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomePage(),
+                        ),
+                      );
                     },
                     child: const ListTile(
                       leading: Icon(Icons.location_city_sharp),
-                      title: Text('City'),
+                      title: Text('Home'),
                     ),
                   ),
                   GestureDetector(
@@ -87,9 +96,11 @@ class _NavDrawerState extends State<NavDrawer> {
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Settings()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Setting(),
+                        ),
+                      );
                     },
                     child: const ListTile(
                       leading: Icon(Icons.settings_outlined),
@@ -120,6 +131,23 @@ class _NavDrawerState extends State<NavDrawer> {
                       title: Text('Support'),
                     ),
                   ),
+                  Consumer<Authentication>(
+                    builder: (_, provider, __) => GestureDetector(
+                      onTap: () {
+                        provider.logout();
+                      },
+                      child: const ListTile(
+                        leading: Icon(
+                          Icons.logout,
+                          color: Colors.red,
+                        ),
+                        title: Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -132,16 +160,19 @@ class _NavDrawerState extends State<NavDrawer> {
             //   },
             //   child: const Text('Switch to Driver'),
             // )
-            BotButton(
-              onTap: () {
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MainDriverPage(),
-                    ),
-                    (route) => false);
-              },
-              title: 'Switch to driver',
+            Consumer<Authentication>(
+              builder: (_, auth, __) => BotButton(
+                onTap: () {
+                  auth.setDriver();
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MainDriverPage(),
+                      ),
+                      (route) => false);
+                },
+                title: 'Switch to driver',
+              ),
             )
           ],
         ),
