@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:indriver_clone/driver/screens/drivermap.dart';
 import 'package:indriver_clone/models/requests.dart';
 import 'package:indriver_clone/providers/handle.dart';
 import 'package:provider/provider.dart';
@@ -64,12 +65,19 @@ class _RideRequestsState extends State<RideRequests>
                       ],
                     ),
                     subtitle: Text('Amount offered: ' +
-                        snapshot.data!.docs[index]['price'] +
+                        provider.requests[index].price! +
                         'FCFA'),
                     trailing: ElevatedButton(
-                      child: const Text('Accept Request'),
+                      child: const Text('See details'),
                       onPressed: () async {
-                        provider.acceptRequest(index, context);
+                        //provider.acceptRequest(index, context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                DriverMap(request: provider.requests[index]),
+                          ),
+                        );
                       },
                     ),
                   );
