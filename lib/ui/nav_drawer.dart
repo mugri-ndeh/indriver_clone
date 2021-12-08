@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:indriver_clone/admin/screens/dashboard.dart';
 import 'package:indriver_clone/driver/screens/main_page.dart';
+import 'package:indriver_clone/driver/screens/upload_docs.dart';
 import 'package:indriver_clone/providers/auth.dart';
 import 'package:indriver_clone/screens/help.dart';
 import 'package:indriver_clone/screens/homepage.dart';
@@ -67,31 +69,61 @@ class _NavDrawerState extends State<NavDrawer> {
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomePage(),
-                        ),
-                      );
-                    },
-                    child: const ListTile(
-                      leading: Icon(Icons.location_city_sharp),
-                      title: Text('Home'),
+                  Consumer<Authentication>(
+                    builder: (_, auth, __) => GestureDetector(
+                      onTap: () {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => !auth.loggedUser.isDriver!
+                                  ? const HomePage()
+                                  : MainDriverPage(),
+                            ),
+                            (route) => false);
+                      },
+                      child: const ListTile(
+                        leading: Icon(Icons.location_city_sharp),
+                        title: Text('Home'),
+                      ),
                     ),
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const RequestHistory()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RequestHistory(),
+                        ),
+                      );
                     },
                     child: const ListTile(
                       leading: Icon(Icons.timer),
                       title: Text('Request History'),
                     ),
+                  ),
+                  Consumer<Authentication>(
+                    builder: (_, provider, __) => provider.loggedUser.isDriver!
+                        ? GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UploadDocs(),
+                                ),
+                              );
+                            },
+                            child: const ListTile(
+                              leading: Icon(
+                                Icons.logout,
+                                color: Colors.red,
+                              ),
+                              title: Text(
+                                'Upload you documents for verification',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          )
+                        : Container(),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -110,9 +142,11 @@ class _NavDrawerState extends State<NavDrawer> {
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Help()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Help(),
+                        ),
+                      );
                     },
                     child: const ListTile(
                       leading: Icon(Icons.info_outline),
@@ -122,9 +156,11 @@ class _NavDrawerState extends State<NavDrawer> {
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Support()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Support(),
+                        ),
+                      );
                     },
                     child: const ListTile(
                       leading: Icon(Icons.support_agent),
@@ -163,16 +199,43 @@ class _NavDrawerState extends State<NavDrawer> {
             Consumer<Authentication>(
               builder: (_, auth, __) => BotButton(
                 onTap: () {
-                  auth.setDriver();
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MainDriverPage(),
-                      ),
-                      (route) => false);
+                  if (!auth.loggedUser.isDriver!) {
+                    auth.setDriver(context);
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MainDriverPage(),
+                        ),
+                        (route) => false);
+                  } else {
+                    auth.setPassenger(context);
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomePage(),
+                        ),
+                        (route) => false);
+                  }
                 },
-                title: 'Switch to driver',
+                title: !auth.loggedUser.isDriver!
+                    ? 'Switch to driver'
+                    : 'Switch to passenger',
               ),
+            ),
+
+            Consumer<Authentication>(
+              builder: (_, auth, __) => auth.loggedUser.isAdmin!
+                  ? BotButton(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Dashboard(),
+                          ),
+                        );
+                      },
+                      title: 'Admin Panel')
+                  : Container(),
             )
           ],
         ),
