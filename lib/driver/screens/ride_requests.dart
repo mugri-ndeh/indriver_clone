@@ -66,7 +66,7 @@ class _RideRequestsState extends State<RideRequests>
                     ),
                     subtitle: Text('Amount offered: ' +
                         provider.requests[index].price! +
-                        'FCFA'),
+                        'KES'),
                     trailing: ElevatedButton(
                       child: const Text('See details'),
                       onPressed: () async {
