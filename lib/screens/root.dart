@@ -17,7 +17,8 @@ class Root extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final user = snapshot.data;
-          return user != null ? HomePage() : const Login();
+          //print(user!.isDriver!);
+          return user != null ? const HomePage() : const Login();
         }
         return const Scaffold(
           body: Center(
