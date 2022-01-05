@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:indriver_clone/providers/auth.dart';
 import 'package:indriver_clone/screens/account_details.dart';
 import 'package:indriver_clone/screens/homepage.dart';
+import 'package:indriver_clone/ui/button.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:provider/provider.dart';
 
@@ -33,13 +35,15 @@ class _VerificationState extends State<Verification> {
   @override
   void initState() {
     super.initState();
-    verifyPhoneNumber();
+    signin(widget.phoneNum, context, _pinController.text);
   }
 
   void verifyPhoneNumber() async {
     var provider = Provider.of<Authentication>(context, listen: false);
     provider.signin(widget.phoneNum, context);
   }
+
+  var pin;
 
   @override
   Widget build(BuildContext context) {
@@ -76,33 +80,123 @@ class _VerificationState extends State<Verification> {
                 pinAnimationType: PinAnimationType.rotation,
                 onSubmit: (pin) async {
                   try {
-                    await FirebaseAuth.instance
-                        .signInWithCredential(
-                      PhoneAuthProvider.credential(
-                          verificationId: verificationCode!, smsCode: pin),
-                    )
-                        .then((value) {
-                      if (value.user != null) {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (c) => HomePage()),
-                        );
-                      }
-                    });
-                  } catch (e) {
+                    print(pin);
+                    //signin(widget.phoneNum, context, pin);
+                  } on FirebaseAuthException catch (e) {
                     FocusScope.of(context).unfocus();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('invalid pin'),
-                        duration: Duration(seconds: 3),
+                      SnackBar(
+                        content: Text(e.toString()),
+                        duration: const Duration(seconds: 3),
                       ),
                     );
                   }
                 },
               ),
-            )
+            ),
+            BotButton(
+                onTap: () async {
+                  print(_pinController.text);
+                  try {
+                    await FirebaseAuth.instance
+                        .signInWithCredential(PhoneAuthProvider.credential(
+                            verificationId: verificationCode!,
+                            smsCode: _pinController.text))
+                        .then((value) async {
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .where('id', isEqualTo: value.user!.uid)
+                          .get()
+                          .then((result) {
+                        if (result.docs.isEmpty) {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const CompleteSignUp(),
+                              ),
+                              (route) => false);
+                        } else {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HomePage(),
+                              ),
+                              (route) => false);
+                        }
+                      });
+                    });
+                  } on FirebaseAuthException catch (e) {
+                    FocusScope.of(context).unfocus();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(e.toString()),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                },
+                title: 'Go')
           ],
         ),
       ),
     );
+  }
+
+  Future<void> signin(
+      String phoneNum, BuildContext context, String smsCode) async {
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNum,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await FirebaseAuth.instance
+              .signInWithCredential(credential)
+              .then((value) async {
+            await FirebaseFirestore.instance
+                .collection('users')
+                .where('id', isEqualTo: value.user!.uid)
+                .get()
+                .then((result) {
+              if (result.docs.isEmpty) {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CompleteSignUp(),
+                    ),
+                    (route) => false);
+              } else {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(),
+                    ),
+                    (route) => false);
+              }
+            });
+          });
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.message.toString()),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        },
+        codeSent: (String vID, int? resendToken) {
+          setState(() {
+            verificationCode = vID;
+          });
+          PhoneAuthCredential cred = PhoneAuthProvider.credential(
+              verificationId: vID, smsCode: smsCode);
+          FirebaseAuth.instance.signInWithCredential(cred);
+        },
+        codeAutoRetrievalTimeout: (String vID) {
+          verificationCode = vID;
+        },
+        timeout: const Duration(seconds: 60),
+      );
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+    }
   }
 }
