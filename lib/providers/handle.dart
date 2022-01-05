@@ -271,6 +271,12 @@ class AppHandler with ChangeNotifier {
       'timeCreated': timeCreated,
       'driverId': '',
       'driverArrived': false,
+      'driverName': '',
+      'driverPic': '',
+      'arrivalTime': '',
+      'answered': false,
+      'driverAccepted': false,
+      'journeyStarted': false,
     };
 
     try {
@@ -319,20 +325,23 @@ class AppHandler with ChangeNotifier {
         .then((value) {
       requests = (value.docs).map((e) => RideRequest.fromDocument(e)).toList();
       notifyListeners();
-      print(requests[0].username);
+      //print(requests[0].username);
     });
     notifyListeners();
     //print(requests[0].username);
   }
 
-  void acceptRequest(index, context) async {
-    var currentUser =
-        Provider.of<Authentication>(context, listen: false).auth.currentUser;
-    await FirebaseFirestore.instance
-        .collection('request')
-        .doc(requests[index].id)
-        .update({'accepted': true, 'driverId': currentUser!.uid}).then((value) {
+  void acceptRequest(id, context, time) async {
+    var currentUser = Provider.of<Authentication>(context, listen: false);
+    await FirebaseFirestore.instance.collection('request').doc(id).update({
+      'driverAccepted': true,
+      'driverId': currentUser.auth.currentUser!.uid,
+      'driverName': currentUser.loggedUser.username,
+      'arrivalTime': time,
+      'driverPic': currentUser.loggedUser.carplatenum
+    }).then((value) {
       requests = [];
+      //Navigator.push(context, MaterialPageRoute(builder: (context)=>),);
       notifyListeners();
     });
   }
