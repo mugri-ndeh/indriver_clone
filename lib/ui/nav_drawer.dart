@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:indriver_clone/admin/screens/admin_root.dart';
 import 'package:indriver_clone/admin/screens/dashboard.dart';
 import 'package:indriver_clone/driver/screens/main_page.dart';
 import 'package:indriver_clone/driver/screens/upload_docs.dart';
@@ -87,44 +88,47 @@ class _NavDrawerState extends State<NavDrawer> {
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RequestHistory(),
-                        ),
-                      );
-                    },
-                    child: const ListTile(
-                      leading: Icon(Icons.timer),
-                      title: Text('Request History'),
-                    ),
-                  ),
-                  Consumer<Authentication>(
-                    builder: (_, provider, __) => provider.loggedUser.isDriver!
-                        ? GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => UploadDocs(),
-                                ),
-                              );
-                            },
-                            child: const ListTile(
-                              leading: Icon(
-                                Icons.logout,
-                                color: Colors.red,
+                  Consumer<Authentication>(builder: (_, provider, __) {
+                    if (provider.loggedUser.isDriver!) {
+                      if (provider.loggedUser.submittedStatus == 'waiting') {
+                        return const ListTile(
+                          leading: Icon(
+                            Icons.lock_clock,
+                            color: buttonColor,
+                          ),
+                          title: Text(
+                            'Waiting for verification',
+                          ),
+                        );
+                      } else if (provider.loggedUser.submittedStatus ==
+                          'verified') {
+                        return Container();
+                      } else {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const UploadDocs(),
                               ),
-                              title: Text(
-                                'Upload you documents for verification',
-                                style: TextStyle(color: Colors.red),
-                              ),
+                            );
+                          },
+                          child: const ListTile(
+                            leading: Icon(
+                              Icons.logout,
+                              color: Colors.red,
                             ),
-                          )
-                        : Container(),
-                  ),
+                            title: Text(
+                              'Upload you documents for verification',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        );
+                      }
+                    } else {
+                      return Container();
+                    }
+                  }),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -230,7 +234,7 @@ class _NavDrawerState extends State<NavDrawer> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Dashboard(),
+                            builder: (context) => AdminRoot(),
                           ),
                         );
                       },
