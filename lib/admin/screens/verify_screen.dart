@@ -155,6 +155,7 @@ class _VerifyDriverState extends State<VerifyDriver> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('User verified'),
+                          backgroundColor: Colors.green,
                         ),
                       );
                       Navigator.pop(context);
@@ -172,6 +173,7 @@ class _VerifyDriverState extends State<VerifyDriver> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Verification denied'),
+                            backgroundColor: Colors.red,
                           ),
                         );
                         Navigator.pop(context);
