@@ -16,22 +16,35 @@ class RideRequest {
   String? price;
   String? driverId;
   bool? driverArrived;
+  String? driverName;
+  String? driverPic;
+  String? arrivalTime;
+  bool? answered;
+  bool? driverAccepted;
+  bool? journeyStarted;
 
-  RideRequest(
-      {this.id,
-      this.accepted,
-      this.startAddress,
-      this.endAddress,
-      this.startLat,
-      this.endLat,
-      this.startLong,
-      this.endLong,
-      this.phoneNum,
-      this.timeCreated,
-      this.price,
-      this.username,
-      this.driverId,
-      this.driverArrived});
+  RideRequest({
+    this.id,
+    this.accepted,
+    this.startAddress,
+    this.endAddress,
+    this.startLat,
+    this.endLat,
+    this.startLong,
+    this.endLong,
+    this.phoneNum,
+    this.timeCreated,
+    this.price,
+    this.username,
+    this.driverId,
+    this.driverArrived,
+    this.driverName,
+    this.driverPic,
+    this.arrivalTime,
+    this.answered,
+    this.driverAccepted,
+    this.journeyStarted,
+  });
 
   factory RideRequest.fromDocument(DocumentSnapshot doc) {
     return RideRequest(
@@ -49,6 +62,12 @@ class RideRequest {
       price: doc['price'],
       driverId: doc['driverId'],
       driverArrived: doc['driverArrived'],
+      driverName: doc['driverName'],
+      driverPic: doc['driverPic'],
+      arrivalTime: doc['arrivalTime'],
+      answered: doc['answered'],
+      driverAccepted: doc['driverAccepted'],
+      journeyStarted: doc['journeyStarted'],
     );
   }
 }
