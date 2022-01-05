@@ -70,7 +70,7 @@ class _DriverMapState extends State<DriverMap> {
                 ],
               ),
               subtitle:
-                  Text('Amount offered: ' + widget.request.price! + 'FCFA'),
+                  Text('Amount offered: ' + widget.request.price! + 'KES'),
             ),
             Padding(
               padding:
@@ -90,20 +90,64 @@ class _DriverMapState extends State<DriverMap> {
             BotButton(
                 onTap: () async {
                   if (_formKey.currentState!.validate()) {
+                    var user =
+                        Provider.of<Authentication>(context, listen: false)
+                            .loggedUser;
                     print('Accepted');
-                    provider.acceptRequest(
-                        widget.request.id, context, minutesController.text);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Waiting(),
-                      ),
-                    );
+                    if (user.submittedStatus == 'verified' &&
+                        user.token == 'OK') {
+                      provider.acceptRequest(
+                          widget.request.id, context, minutesController.text);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Waiting(),
+                        ),
+                      );
+                    } else if (user.submittedStatus == '') {
+                      //tell to submit docs
+                      showAlert(
+                          'Please Submit your documents to continue', size);
+                    } else if (user.submittedStatus == 'waiting') {
+                      //tell user to wait for doc verification
+                      showAlert(
+                          'Your documents are in processing. It might take a while plaese hold on',
+                          size);
+                    } else if (user.token == 'suspended') {
+                      // tell the user their account has been blocked and cant work no more
+                      showAlert(
+                          'Your account has been suspended. Please logout and create a new one that doesnt violate our privacy policies',
+                          size);
+                    }
                   }
                   //provider.acceptRequest(index, context);
                 },
                 title: 'Accept')
           ],
+        ),
+      ),
+    );
+  }
+
+  void showAlert(String message, Size size) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: SizedBox(
+          height: 150,
+          width: size.width * 0.6,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Please select a drop off location'),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              )
+            ],
+          ),
         ),
       ),
     );
