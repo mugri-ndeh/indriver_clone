@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:indriver_clone/admin/screens/user_details.dart';
 import 'package:indriver_clone/models/user.dart';
 import 'package:indriver_clone/ui/constants.dart';
 
@@ -10,7 +11,10 @@ class MonitorDrivers extends StatefulWidget {
   _MonitorDriversState createState() => _MonitorDriversState();
 }
 
-class _MonitorDriversState extends State<MonitorDrivers> {
+class _MonitorDriversState extends State<MonitorDrivers>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   var data;
   Stream<QuerySnapshot?> allUsers() {
     return FirebaseFirestore.instance
@@ -71,7 +75,15 @@ class _MonitorDriversState extends State<MonitorDrivers> {
                           ],
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    MonitoringDriver(user: userList[index]),
+                              ),
+                            );
+                          },
                           child: const Text('View Details'),
                         ),
                       ],
