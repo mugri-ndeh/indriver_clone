@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:indriver_clone/driver/screens/main_page.dart';
 import 'package:indriver_clone/providers/auth.dart';
 import 'package:indriver_clone/providers/handle.dart';
+import 'package:indriver_clone/screens/account_details.dart';
 import 'package:indriver_clone/screens/search_screen.dart';
 import 'package:indriver_clone/screens/send_requests.dart';
 import 'package:indriver_clone/screens/userprogressmap.dart';
@@ -32,179 +35,213 @@ class _HomePageState extends State<HomePage> {
     var prov = Provider.of<Authentication>(context, listen: false);
     provider.mapController = controller;
     provider.locatePosition(context);
-    print('Currency');
-    currency();
   }
 
   GoogleMapController? newController;
 
   _mapTapped(LatLng location) {
     print(location);
-// The result will be the location you've been selected
-// something like this LatLng(12.12323,34.12312)
-// you can do whatever you do with it
   }
+
+  final _moneyController = TextEditingController();
+  final _wishesController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  var user;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    request = getRequests();
+    user = userId();
+  }
+
+  Stream<QuerySnapshot> userId() {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .where('id', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .snapshots();
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     var auth = Provider.of<Authentication>(context, listen: false);
-    return Scaffold(
-      drawer: const NavDrawer(),
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
-      appBar: const HomeAppBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Consumer<AppHandler>(
-              builder: (_, location, __) => SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: GoogleMap(
-                  onTap: _mapTapped,
-                  mapType: MapType.normal,
-                  myLocationEnabled: true,
-                  markers: location.markersSet,
-                  circles: location.circlesSet,
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: _center,
-                    zoom: 14.0,
-                  ),
-                  myLocationButtonEnabled: true,
-                  //zoomControlsEnabled: true,
-                  zoomGesturesEnabled: true,
-                  polylines: location.polylineSet,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.3,
-              child: Form(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: SingleChildScrollView(
-                    child: Consumer<AppHandler>(
-                      builder: (_, location, __) => Column(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showBottom(context, size, true);
-                            },
-                            child: ListTile(
-                              leading: Icon(
-                                Icons.circle_outlined,
-                                color: location.startSelected
-                                    ? startMarker
-                                    : notSelected,
-                              ),
-                              title: Text(location.startpoint),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              //location.findPlace('');
-                              showBottom(context, size, false);
-                            },
-                            child: ListTile(
-                              leading: Icon(
-                                Icons.circle_outlined,
-                                color: location.endSelected
-                                    ? endMarker
-                                    : notSelected,
-                              ),
-                              title: Stack(children: [
-                                Text(location.endpoint),
-                                const Positioned(
-                                  child: Divider(
-                                    thickness: 5,
-                                  ),
-                                  top: 10,
-                                )
-                              ]),
-                            ),
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.money_sharp),
-                            title: TextFormField(
-                              decoration: const InputDecoration(
-                                  hintText: 'Offer your fare'),
-                            ),
-                          ),
-                          ListTile(
-                              leading: const Icon(Icons.message),
-                              title: TextFormField(
-                                decoration: const InputDecoration(
-                                    hintText: 'Comment and wishes'),
-                              )),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Consumer<AppHandler>(
-              builder: (_, loc, __) => BotButton(
-                  onTap: () {
-                    print(loc.endpoint);
-                    if (loc.endpoint != 'End point') {
-                      loc.sendRequest(
-                          loc.pickupLocation!.latitude!.toString(),
-                          loc.pickupLocation!.longitude!.toString(),
-                          false,
-                          auth.loggedUser.username!,
-                          DateTime.now().toString(),
-                          '672617465',
-                          loc.pickupLocation!.placeName!,
-                          loc.destinationLocation!.placeName!,
-                          loc.destinationLocation!.latitude!.toString(),
-                          loc.destinationLocation!.longitude!.toString(),
-                          '500');
 
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SendingRequests(),
+    return StreamBuilder<QuerySnapshot>(
+        stream: user,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.data!.docs.isEmpty) {
+            return const CompleteSignUp();
+          } else {
+            return Scaffold(
+                drawer: const NavDrawer(),
+                extendBodyBehindAppBar: true,
+                backgroundColor: Colors.white,
+                appBar: const HomeAppBar(),
+                body: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Consumer<AppHandler>(
+                        builder: (_, location, __) => SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          child: GoogleMap(
+                            onTap: _mapTapped,
+                            mapType: MapType.normal,
+                            myLocationEnabled: true,
+                            markers: location.markersSet,
+                            circles: location.circlesSet,
+                            onMapCreated: _onMapCreated,
+                            initialCameraPosition: CameraPosition(
+                              target: _center,
+                              zoom: 14.0,
+                            ),
+                            myLocationButtonEnabled: true,
+                            zoomControlsEnabled: true,
+                            zoomGesturesEnabled: true,
+                            polylines: location.polylineSet,
+                          ),
                         ),
-                      );
-                    } else {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          content: SizedBox(
-                            height: 150,
-                            width: size.width * 0.6,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('Please select a drop off location'),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('OK'),
-                                )
-                              ],
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        child: Form(
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Form(
+                              key: _formKey,
+                              child: SingleChildScrollView(
+                                child: Consumer<AppHandler>(
+                                  builder: (_, location, __) => Column(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          showBottom(context, size, true);
+                                        },
+                                        child: ListTile(
+                                          leading: Icon(
+                                            Icons.circle_outlined,
+                                            color: location.startSelected
+                                                ? startMarker
+                                                : notSelected,
+                                          ),
+                                          title: Text(location.startpoint),
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          //location.findPlace('');
+                                          showBottom(context, size, false);
+                                        },
+                                        child: ListTile(
+                                          leading: Icon(
+                                            Icons.circle_outlined,
+                                            color: location.endSelected
+                                                ? endMarker
+                                                : notSelected,
+                                          ),
+                                          title: Stack(children: [
+                                            Text(location.endpoint),
+                                            const Positioned(
+                                              child: Divider(
+                                                thickness: 5,
+                                              ),
+                                              top: 10,
+                                            )
+                                          ]),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        leading: const Icon(Icons.money_sharp),
+                                        title: TextFormField(
+                                          controller: _moneyController,
+                                          validator: (val) => val!.isEmpty
+                                              ? 'Please enter your price'
+                                              : null,
+                                          decoration: const InputDecoration(
+                                              hintText: 'Offer your fare, KES'),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        leading: const Icon(Icons.message),
+                                        title: TextFormField(
+                                          controller: _wishesController,
+                                          decoration: const InputDecoration(
+                                              hintText: 'Comment and wishes'),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      );
-                    }
-                  },
-                  title: 'Request a vehicle'),
-            )
-          ],
-        ),
-      ),
-    );
+                      ),
+                      Consumer<AppHandler>(
+                        builder: (_, loc, __) => BotButton(
+                            onTap: () {
+                              print(loc.endpoint);
+                              if (loc.endpoint != 'End point') {
+                                if (_formKey.currentState!.validate()) {
+                                  loc.sendRequest(
+                                      loc.pickupLocation!.latitude!.toString(),
+                                      loc.pickupLocation!.longitude!.toString(),
+                                      false,
+                                      auth.loggedUser.username!,
+                                      DateTime.now().toString(),
+                                      '672617465',
+                                      loc.pickupLocation!.placeName!,
+                                      loc.destinationLocation!.placeName!,
+                                      loc.destinationLocation!.latitude!
+                                          .toString(),
+                                      loc.destinationLocation!.longitude!
+                                          .toString(),
+                                      _moneyController.text);
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SendingRequests(),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    content: SizedBox(
+                                      height: 150,
+                                      width: size.width * 0.6,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                              'Please select a drop off location'),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('OK'),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            title: 'Request a vehicle'),
+                      )
+                    ],
+                  ),
+                ));
+          }
+        });
   }
 
   showBottom(BuildContext context, Size size, bool pickup) {
@@ -215,57 +252,5 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) => SearchScreen(pickup: pickup),
     );
-  }
-
-  void currency() {
-    Locale locale = Localizations.localeOf(context);
-    var format = NumberFormat.simpleCurrency(locale: locale.toString());
-    print("CURRENCY SYMBOL ${format.currencySymbol}"); // $
-    print("CURRENCY NAME ${format.currencyName}"); // USD
-  }
-
-  Future<bool> _cancelRequest() async {
-    //loc.removeRequest();
-    return true;
-  }
-
-  Stream<QuerySnapshot>? getRequests() {
-    var provider = Provider.of<Authentication>(context, listen: false);
-    try {
-      return FirebaseFirestore.instance
-          .collection('request')
-          .where('accepted', isEqualTo: false)
-          .where('id', isEqualTo: provider.auth.currentUser!.uid)
-          .snapshots();
-    } catch (e) {
-      return null;
-    }
-    //print(requests[0].username);
-  }
-
-  void acceptRequest(context) async {
-    var currentUser =
-        Provider.of<Authentication>(context, listen: false).auth.currentUser;
-    await FirebaseFirestore.instance
-        .collection('request')
-        .doc(currentUser!.uid)
-        .update({
-      'accepted': true,
-    }).then((value) {
-      print('Waiting for Driver');
-    });
-  }
-
-  void declineRequest(context) async {
-    var currentUser =
-        Provider.of<Authentication>(context, listen: false).auth.currentUser;
-    await FirebaseFirestore.instance
-        .collection('request')
-        .doc(currentUser!.uid)
-        .update({
-      'driverId': "",
-    }).then((value) {
-      print('Waiting for Driver');
-    });
   }
 }
