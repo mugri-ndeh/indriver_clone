@@ -1,10 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:indriver_clone/driver/screens/earnings.dart';
 import 'package:indriver_clone/driver/screens/rating.dart';
 import 'package:indriver_clone/driver/screens/ride_requests.dart';
+import 'package:indriver_clone/driver/screens/upload_docs.dart';
+import 'package:indriver_clone/providers/auth.dart';
+import 'package:indriver_clone/ui/button.dart';
 import 'package:indriver_clone/ui/constants.dart';
 import 'package:indriver_clone/ui/nav_drawer.dart';
 import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
+import 'package:provider/provider.dart';
 
 class MainDriverPage extends StatefulWidget {
   MainDriverPage({Key? key}) : super(key: key);
@@ -27,6 +32,8 @@ class _MainDriverPageState extends State<MainDriverPage> {
     // TODO: implement initState
     super.initState();
     pageController = PageController();
+    var user = Provider.of<Authentication>(context, listen: false).loggedUser;
+    toggleIndex = user.isOnline! ? 1 : 0;
   }
 
   @override
@@ -68,8 +75,55 @@ class _MainDriverPageState extends State<MainDriverPage> {
             labels: const ["offline", "online"],
             //icons: const [Icons.person, Icons.pregnant_woman],
             selectedLabelIndex: (index) {
+              var provider =
+                  Provider.of<Authentication>(context, listen: false);
               setState(() {
                 toggleIndex = index;
+
+                if (toggleIndex == 1) {
+                  FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(provider.loggedUser.id)
+                      .get()
+                      .then((value) {
+                    if (value['submittedStatus'] != 'verified') {
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                content: Column(
+                                  children: [
+                                    const Text(
+                                        'You have not yet submitted your documents. Please submit to be able to go on rides '),
+                                    BotButton(
+                                        onTap: () {
+                                          toggleIndex = 0;
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const UploadDocs(),
+                                            ),
+                                          );
+                                        },
+                                        title: 'Submit documents'),
+                                    BotButton(
+                                        onTap: () {
+                                          toggleIndex = 0;
+                                          provider.goOffline(context);
+                                          Navigator.pop(context);
+                                        },
+                                        title: 'Go back')
+                                  ],
+                                ),
+                              ));
+                    } else {
+                      provider.goOnline(context);
+                    }
+                  });
+                } else {
+                  provider.goOffline(context);
+                  print('Yep I\'ve submitted OK');
+                }
               });
 
               print("Selected Index $index");
