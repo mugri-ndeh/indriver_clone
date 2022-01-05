@@ -54,9 +54,9 @@ class _LoginState extends State<Login> {
   final TextEditingController controller1 = TextEditingController();
   String? _platformVersion = 'Unknown';
 
-  String initialCountry = 'NG';
+  String initialCountry = 'KE';
 
-  PhoneNumber _number = PhoneNumber(isoCode: 'NG');
+  PhoneNumber _number = PhoneNumber(isoCode: 'KE');
   String? locale;
 
   final _formKey = GlobalKey<FormState>();
