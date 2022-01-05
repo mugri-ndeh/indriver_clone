@@ -1,3 +1,3 @@
 class Config {
-  static String api_key = "AIzaSyBmnVJzMnmIJq0oRk4BiOpr_hVZm3fIOBE";
+  static String api_key = "AIzaSyAMd1DbT3kS4h1rG-xObd7YVESI0oFiyBk";
 }
