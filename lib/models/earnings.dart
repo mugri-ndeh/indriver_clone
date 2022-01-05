@@ -1,22 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:indriver_clone/driver/screens/earnings.dart';
 
 class Earnings {
   String? amount;
   String? date;
-  String? rating;
+  String? driverId;
 
   Earnings({
     this.amount,
     this.date,
-    this.rating,
+    this.driverId,
   });
 
   factory Earnings.fromDocument(DocumentSnapshot doc) {
     return Earnings(
       amount: doc['amount'],
       date: doc['date'],
-      rating: doc['rating'],
+      driverId: doc['driverId'],
     );
   }
 }
