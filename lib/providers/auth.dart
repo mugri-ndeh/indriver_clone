@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:indriver_clone/driver/screens/main_page.dart';
 import 'package:indriver_clone/models/user.dart';
 import 'package:indriver_clone/screens/account_details.dart';
 import 'package:indriver_clone/screens/homepage.dart';
@@ -78,7 +79,7 @@ class Authentication with ChangeNotifier {
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HomePage(),
+                      builder: (context) => const HomePage(),
                     ),
                     (route) => false);
                 notifyListeners();
@@ -127,6 +128,11 @@ class Authentication with ChangeNotifier {
       'trips': 0,
       'rating': 0.0,
       'dob': dob,
+      'driverAccount': false,
+      'isAdmin': false,
+      'submittedStatus': '',
+      'verified': false,
+      'earnings': 0,
     };
     try {
       await _firestore
@@ -137,10 +143,18 @@ class Authentication with ChangeNotifier {
         loggedUser = await returnUser();
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(
+              builder: (context) => const HomePage(),
+            ),
             (route) => false);
       });
     } on FirebaseException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message!),
+          duration: const Duration(seconds: 4),
+        ),
+      );
       print(e.message);
     }
   }
@@ -183,12 +197,43 @@ class Authentication with ChangeNotifier {
     return user;
   }
 
-  void setDriver() async {
+  void setDriver(BuildContext context) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(auth.currentUser!.uid)
         .update({'isDriver': true}).then((value) async {
       loggedUser = await returnUser();
     });
+    notifyListeners();
+  }
+
+  void setPassenger(BuildContext context) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .update({'isDriver': false}).then((value) async {
+      loggedUser = await returnUser();
+    });
+    notifyListeners();
+  }
+
+  void goOnline(BuildContext context) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .update({'isOnline': true}).then((value) async {
+      loggedUser = await returnUser();
+    });
+    notifyListeners();
+  }
+
+  void goOffline(BuildContext context) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .update({'isOnline': false}).then((value) async {
+      loggedUser = await returnUser();
+    });
+    notifyListeners();
   }
 }
