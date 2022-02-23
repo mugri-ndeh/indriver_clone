@@ -3,8 +3,6 @@
 This project is a modified clone of the inDriver app which is a taxi/car booking app and has similar functionalities to uber. The single app contains the driver and rider section 
 
 ## Features
-
-- Login
 - Authentication with firebase
   - SignUp
   - Login
