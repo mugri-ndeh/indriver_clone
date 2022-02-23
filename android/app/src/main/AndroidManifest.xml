@@ -8,7 +8,7 @@
         android:label="safeDrive"
         android:icon="@mipmap/launcher_icon"> 
         <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyAMd1DbT3kS4h1rG-xObd7YVESI0oFiyBk"/>
+               android:value="YOUR_API_KEY"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
